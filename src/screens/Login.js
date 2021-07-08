@@ -1,12 +1,15 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
-import { ScrollView } from "react-native-gesture-handler";
+import { _storeUser, _retrieveUser } from '../api'
 import { useNavigation } from '@react-navigation/native';
 import styled from "styled-components/native"
+import { Dimensions } from 'react-native';
+
+console.log()
 
 const ScreenContainer = styled.View`
     padding: 20px;
-    padding-top: 150px;
+    padding-top: ${parseInt((Dimensions.get('window').height - 100)/ 3)}px;
     background-color: #fff;
 `
 const InputField = styled.TextInput`
@@ -40,30 +43,39 @@ export default function LoginPage() {
 
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-    const [usernameError, setUsernameError] = useState({error: false, message: ""})
-    const [passwordError, setPasswordError] = useState({error: false, message: ""})
+    const [usernameError, setUsernameError] = useState({ error: false, message: "" })
+    const [passwordError, setPasswordError] = useState({ error: false, message: "" })
     const passwordInput = useRef(null)
     const navigation = useNavigation()
+
+    React.useEffect(async ()=>{
+        const user = await _retrieveUser()
+        if(user) {
+            navigation.push("Main")
+            console.log(user)
+        }
+     },[])
 
     const onPress = () => {
         console.log(username, password)
         // check length username and password
         // if error setError
-        if(username.length < 3){ 
-            setUsernameError({error: true, message: 'Username too short'})
-        } else if (password.length < 6){
-            setPasswordError({error: true, message: "password too short"})
+        if (username.length < 3) {
+            setUsernameError({ error: true, message: 'Username too short' })
+        } else if (password.length < 6) {
+            setPasswordError({ error: true, message: "password too short" })
         } else {
             // navigate
-            setUsernameError({error: false, message: ""})
-            setPasswordError({error: false, message: ""})
+            setUsernameError({ error: false, message: "" })
+            setPasswordError({ error: false, message: "" })
+            _storeUser(username)
             navigation.push("Main")
         }
     }
 
     return (
         <ScreenContainer style={styles.container}>
-            <View style={{width: "100%"}}>
+            <View style={{ width: "100%" }}>
 
                 <View>
                     <Label>
@@ -79,7 +91,7 @@ export default function LoginPage() {
                     autoCorrect={false}
                     value={username}
                     onChangeText={setUsername}
-                    onFocus={() => setUsernameError({error: false, message: ""})}
+                    onFocus={() => setUsernameError({ error: false, message: "" })}
                 />
                 {usernameError.error && <Label style={{ color: "red", marginTop: 10 }}>{usernameError.message}</Label>}
                 <InputField
@@ -90,7 +102,7 @@ export default function LoginPage() {
                     keyboardType="default"
                     value={password}
                     onChangeText={setPassword}
-                    onFocus={() => setPasswordError({error: false, message: ""})}
+                    onFocus={() => setPasswordError({ error: false, message: "" })}
                 />
                 {passwordError.error && <Label style={{ color: "red", marginTop: 10 }}>{passwordError.message}</Label>}
                 <Button onPress={onPress}>

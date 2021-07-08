@@ -1,12 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
-// import type { Node } from 'react';
 import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
@@ -16,7 +7,7 @@ import {
   StyleSheet, LayoutAnimation, Platform, UIManager, ActivityIndicator
 } from 'react-native';
 import { generateAntWinLikelihoodCalculator, shallowCopyArray } from '../utilities'
-import { fetchAnts } from '../api'
+import { fetchAnts, _retrieveUser } from '../api'
 import styled from "styled-components/native"
 import AntsTable from '../components'
 
@@ -27,12 +18,19 @@ const SafeArea = styled.SafeAreaView`
   background-color: pink;
 `
 
+const Label = styled.Text`
+  font-size: 16px;
+  text-align: center;
+  color: black;
+  padding-top: 10px;
+`
+
 const Button = styled.TouchableOpacity`
   align-items: center;
   background-color: #009688;
   padding: 10px;
   border-radius: 10px;
-  margin: 10px 40px;
+  margin: 20px 40px 10px 40px;
 `
 
 const ButtonText = styled.Text`
@@ -43,12 +41,19 @@ const ButtonText = styled.Text`
   text-transform: uppercase;
 `
 
-const App = () => {
+const Main = () => {
+  const [username, setUsername] = useState(null)
   const [ants, setAnts] = useState([])
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(false)
 
   useEffect(async () => {
+    // Find a way to not repeate this getter
+    const user = await _retrieveUser()
+    if(user) {
+      setUsername(user)
+    }
+
     // response will either have data or errors
     setLoading(true)
     const response = await fetchAnts()
@@ -103,6 +108,7 @@ const App = () => {
   return (
       <SafeAreaView style={{ backgroundColor: "pink", flex: 1, marginTop: StatusBar.currentHeight || 0 }}>
         <StatusBar barStyle={'light-content'} />
+        {username && <Label>Welcome back, {username}</Label>}
         {error && <Text>Error</Text> }
         {loading ? <ActivityIndicator /> : (
         <View>
@@ -115,4 +121,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Main;
