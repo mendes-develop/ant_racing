@@ -10,6 +10,7 @@ import { generateAntWinLikelihoodCalculator, shallowCopyArray } from '../utiliti
 import { fetchAnts, _retrieveUser } from '../api'
 import styled from "styled-components/native"
 import AntsTable from '../components'
+import Marquee from '../components/Marquee'
 
 const SafeArea = styled.SafeAreaView`
   margin-top: 32px;
@@ -117,6 +118,8 @@ const Main = () => {
           </Button>
           <AntsTable data={ants} />
         </View>)}
+        
+        <Marquee/>
       </SafeAreaView>
   );
 };
