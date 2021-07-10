@@ -8,9 +8,9 @@ import LoginScreen from './screens/Login'
 import { Text } from 'react-native';
 import styled from "styled-components/native"
 import { useNavigation } from '@react-navigation/native';
-import { _deleteUser } from './api'
+import { _deleteUser } from './services/storage'
 
-const Label = styled.Text`
+const Logout = styled.Text`
   font-size: 16px;
   text-align: center;
   color: black;
@@ -21,12 +21,12 @@ const LandStack = createStackNavigator();
 const MainStack = createStackNavigator();
 const RootStack = createStackNavigator();
 
-
+const Routes = { Login: "Login", Main: "Main" }
 function LandStackScreen() {
     return (
         <LandStack.Navigator>
             <LandStack.Screen
-                name="Land"
+                name={Routes.Login}
                 component={LoginScreen}
                 options={{ headerShown: false }}
             />
@@ -36,20 +36,18 @@ function LandStackScreen() {
 
 function MainStackScreen() {
     const navigation = useNavigation()
-
     return (
         <MainStack.Navigator>
-            <MainStack.Screen name="Main" component={MainScreen} options={{
+            <MainStack.Screen name={Routes.Main} component={MainScreen} options={{
                 headerLeft: () => null,
                 headerRight: (props) => (
-                    <Label
+                    <Logout
                         {...props}
                         onPress={() => {
-                            console.log("Logging out and going back to launch screen")
                             _deleteUser()
-                            navigation.push("Login")
+                            navigation.push(Routes.Login)
                         }}
-                    >Logout</Label>
+                    >Logout</Logout>
                 ),
             }} />
         </MainStack.Navigator>
@@ -59,23 +57,19 @@ function MainStackScreen() {
 const App = () => {
     return (
         <NavigationContainer>
-            <RootStack.Navigator initialRouteName={"Login"}>
-
+            <RootStack.Navigator initialRouteName={Routes.Login}>
                 <RootStack.Screen
-                    name="Login"
+                    name={Routes.Login}
                     component={LandStackScreen}
                     options={{ headerShown: false }}
                 />
-
                 <RootStack.Screen
-                    name="Main"
+                    name={Routes.Main}
                     component={MainStackScreen}
                     options={{ headerShown: false, tabBarVisible: false }}
                 />
-
             </RootStack.Navigator>
         </NavigationContainer>
     )
 }
-
 export default App
