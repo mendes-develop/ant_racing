@@ -1,17 +1,25 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
-import { _storeUser, _retrieveUser } from '../api'
+import {  SafeAreaView,   StatusBar,} from 'react-native'
+import { _storeUser, _retrieveUser } from '../services/storage'
 import { useNavigation } from '@react-navigation/native';
 import styled from "styled-components/native"
-import { Dimensions, Animated, Image, Easing } from 'react-native';
-import Marquee from '../components/Marquee'
+import { Dimensions } from 'react-native';
 
-const dimension = (Dimensions.get('window'))
+const dimensions = (Dimensions.get('window'))
 
 const ScreenContainer = styled.View`
     padding: 20px;
-    padding-top: ${ parseInt(dimension.height - 100) / 3 }px;
-    background-color: #fff;
+    padding-top: ${parseInt(dimensions.height - 100) / 5}px;
+    /* background-color: pink; */
+    width: 100%;
+`
+const Title = styled.Text`
+  font-size: 26px;
+  text-align: center;
+  color: #009688;
+  padding-top: 10px;
+  font-weight: 700;
+  /* font-family: Verdana, sans-serif; */
 `
 const InputField = styled.TextInput`
     padding: 10px;
@@ -39,8 +47,6 @@ const Label = styled.Text`
   text-align: center;
   color: gray;
 `
-
-// LOGIN PAGE
 export default function LoginPage() {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
@@ -53,7 +59,6 @@ export default function LoginPage() {
         const user = await _retrieveUser()
         if (user) {
             navigation.push("Main")
-            console.log(user)
         }
     }, [])
 
@@ -74,15 +79,14 @@ export default function LoginPage() {
     }
 
     return (
-        <ScreenContainer style={styles.container}>
-            <View style={{ width: "100%" }}>
-
-                <View>
-                    <Label>
-                        You must be logged in to start racing.
-                    </Label>
-                </View>
-
+        <SafeAreaView style={{ backgroundColor: "#fff", flex: 1, marginTop: StatusBar.currentHeight || 0 }}>
+                <Title>
+                    Ants' Race
+                </Title>
+            <ScreenContainer >
+                <Label>
+                    You must be logged in to start racing.
+                </Label>
                 <InputField
                     placeholder="Username"
                     returnKeyType="next"
@@ -108,19 +112,7 @@ export default function LoginPage() {
                 <Button onPress={onPress}>
                     <ButtonText>LOG IN</ButtonText>
                 </Button>
-            </View>
-
             </ScreenContainer>
+        </SafeAreaView>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        // paddingLeft: 0
-    },
-    image: {
-        width: 227,
-        height: 200,
-    },
-})
