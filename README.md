@@ -2,8 +2,10 @@
 # Ants Racing
 
 React Native take home test.
-<img src="images/login.png" alt="login screen" width="50%" height="50%">
-<img src="images/main.png" alt="main screen" width="300" height="500">
+<div>
+    <img src="images/login.png" alt="login screen" width="30%" height="30%">
+    <img src="images/main.png" alt="main screen" width="30%" height="30%">
+</div>
 ![GitHub Logo](images/login.png){:height="50%" width="50%"}
 ![GitHub Logo](images/main.png){:height="50%" width="50%"}
 
