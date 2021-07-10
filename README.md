@@ -3,8 +3,8 @@
 
 React Native take home test.
 
-![GitHub Logo](images/login.png)
-![GitHub Logo](images/main.png)
+![GitHub Logo](images/login.png){:height="50%" width="50%"}
+![GitHub Logo](images/main.png){:height="50%" width="50%"}
 
 ### Deliverables
 
