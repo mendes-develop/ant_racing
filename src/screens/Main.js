@@ -30,23 +30,24 @@ const ButtonText = styled.Text`
   align-self: center;
   text-transform: uppercase;
 `
-const Main = () => {
-  const [username, setUsername] = useState(null)
-  const [ants, setAnts] = useState([])
+const Main = (props) => {
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [username, setUsername] = useState(null)
+  const [antsList, setAntsList] = useState([])
 
   useEffect(async () => {
+    console.log(props)
     setLoading(true)
     // response will either have data or errors
     const response = await fetchAnts()
     if (response.data) {
-      const antsArray = response.data.ants.map((ant, i) => {
+      const antsData = response.data.ants.map((ant, i) => {
         ant.likelihood = null;
         ant.loading = false
         return ant
       })
-      setAnts(antsArray)
+      setAntsList(antsData)
     } else if (response.errors) {
       setError(true)
     }
@@ -62,27 +63,37 @@ const Main = () => {
       UIManager.setLayoutAnimationEnabledExperimental(true);
     }
   }, [])
-  
+
 
   const onPress = () => {
-    (ants).forEach((ant, index) => {
-      setLoading(true);
-      // slice the state and create a new Array
+    setLoading(true);
+    // map and update antsList loading state and likelihood
+    const loadingAnts = antsList.map(ant => {
+      ant.likelihood = null
       ant.loading = true
-      const shallowCopy = shallowCopyArray(index, ants)
-      setAnts([...shallowCopy, ant])
+      return ant
+    })
+    // update state
+    setAntsList(loadingAnts)
+    runAlgorithm()
+  }
 
-      const callback = generateAntWinLikelihoodCalculator()
-      callback(function (value) {
-        // update ant likelihood and ant loading state
+  const runAlgorithm = async () => {
+    (antsList).forEach((ant, index, array) => {
+      // const shallowCopy = shallowCopyArray(index, antsList)
+      const closure = generateAntWinLikelihoodCalculator()
+
+      // inside the callback, update ant's likelihood and loading state
+      // make a copy of the array without curr ant, append current and sort it
+      // update list
+      closure((likelihood) => {
+        ant.likelihood = likelihood
         ant.loading = false
-        ant.likelihood = value
+        const arr = [ant, ...shallowCopyArray(index, antsList)].sort((a, b) => (b.likelihood || 0.0) - (a.likelihood || 0.0))
 
-        // Array.sort
-        const sortedArray = [ant, ...shallowCopy,].sort((a, b) => (b.likelihood || 0) - (a.likelihood || 0))
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        setAnts(sortedArray)
-        if (index === ants.length - 1) setLoading(false)
+        setAntsList(arr)
+        if(index === array.length - 1) setLoading(false)
       })
     })
   }
@@ -95,10 +106,10 @@ const Main = () => {
         {username && <Label>Welcome back, {username}</Label>}
         {error ? <Text>Error</Text> : (
           <View>
-            <Button onPress={() => {  onPress(); }}>
+            <Button onPress={onPress}>
               <ButtonText>Calculate Odds</ButtonText>
             </Button>
-            <AntsTable data={ants} />
+            <AntsTable data={antsList} />
           </View>)}
         <Marquee />
       </SafeAreaView>
