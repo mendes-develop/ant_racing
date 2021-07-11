@@ -2,10 +2,6 @@
 # Ants Racing
 
 React Native take home test.
-<div>
-    <img src="images/login.png" alt="login screen" width="30%" height="30%">
-    <img src="images/main.png" alt="main screen" width="30%" height="30%">
-</div>
 
 ### Deliverables
 
@@ -25,20 +21,27 @@ React Native take home test.
 - Clever / aesthetically pleasing transitions
 
 ## Installation
-
+Clone the repository
+```bash
+git clone https://github.com/mendes-develop/ant_racing.git
+```
+and install the dependencies
 ```bash
 cd ant_racing/ && yarn install
 ```
 
-iOS Simulator
+Run Application on an iOS Simulator
 ```bash
 yarn ios
 ```
 
-android Simulator
+Run Application on an android Simulator
 ```bash
 yarn android
 ```
 
-
+<div>
+    <img src="images/login.png" alt="login screen" width="30%" height="30%">
+    <img src="images/main.png" alt="main screen" width="30%" height="30%">
+</div>
 

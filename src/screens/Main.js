@@ -41,7 +41,7 @@ const Main = () => {
     // response will either have data or errors
     const response = await fetchAnts()
     if (response.data) {
-      const antsArray = response.data.ants.map((ant, index) => {
+      const antsArray = response.data.ants.map((ant, i) => {
         ant.likelihood = null;
         ant.loading = false
         return ant
@@ -62,12 +62,11 @@ const Main = () => {
       UIManager.setLayoutAnimationEnabledExperimental(true);
     }
   }, [])
+  
 
   const onPress = () => {
-    // trigger algorithm function for each of the ants 
-    // setloading(true)
-    // [TODO] perform constant time operations if array.length increases exponentially
     (ants).forEach((ant, index) => {
+      setLoading(true);
       // slice the state and create a new Array
       ant.loading = true
       const shallowCopy = shallowCopyArray(index, ants)
@@ -80,7 +79,7 @@ const Main = () => {
         ant.likelihood = value
 
         // Array.sort
-        const sortedArray = [...shallowCopy, ant].sort((a, b) => (b.likelihood || 0) - (a.likelihood || 0))
+        const sortedArray = [ant, ...shallowCopy,].sort((a, b) => (b.likelihood || 0) - (a.likelihood || 0))
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setAnts(sortedArray)
         if (index === ants.length - 1) setLoading(false)
@@ -96,7 +95,7 @@ const Main = () => {
         {username && <Label>Welcome back, {username}</Label>}
         {error ? <Text>Error</Text> : (
           <View>
-            <Button onPress={() => { setLoading(true); onPress(); }}>
+            <Button onPress={() => {  onPress(); }}>
               <ButtonText>Calculate Odds</ButtonText>
             </Button>
             <AntsTable data={ants} />

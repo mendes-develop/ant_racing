@@ -1,9 +1,6 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
-import { _storeUser, _retrieveUser } from '../services/api'
-import { useNavigation } from '@react-navigation/native';
-import styled from "styled-components/native"
-import { Dimensions, Animated, Image, Easing } from 'react-native';
+import React from 'react';
+import { View } from 'react-native'
+import { Dimensions, Animated, Easing } from 'react-native';
 
 const width = Dimensions.get('window').width
 export default class Marquee extends React.Component {
