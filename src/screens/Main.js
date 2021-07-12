@@ -4,7 +4,7 @@ import {
   StatusBar,
   View, LayoutAnimation, Platform, UIManager, ActivityIndicator
 } from 'react-native';
-import { generateAntWinLikelihoodCalculator, shallowCopyArray } from '../utilities'
+import { generateAntWinLikelihoodCalculator } from '../utilities'
 import { _retrieveUser } from '../services/storage'
 import { fetchAnts } from '../services/api'
 import { AntsTable, Marquee, Overlay } from '../components'
@@ -30,14 +30,13 @@ const ButtonText = styled.Text`
   align-self: center;
   text-transform: uppercase;
 `
-const Main = (props) => {
+const Main = ({ navigation, route }) => {
+  const { username } = route.params
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [username, setUsername] = useState(null)
   const [antsList, setAntsList] = useState([])
 
   useEffect(async () => {
-    console.log(props)
     setLoading(true)
     // response will either have data or errors
     const response = await fetchAnts()
@@ -55,10 +54,6 @@ const Main = (props) => {
   }, [])
 
   useEffect(async () => {
-    // Find a way to not repeate this getter
-    const user = await _retrieveUser()
-    if (user) setUsername(user)
-
     if (Platform.OS === 'android') {
       UIManager.setLayoutAnimationEnabledExperimental(true);
     }
@@ -78,6 +73,11 @@ const Main = (props) => {
     runAlgorithm()
   }
 
+  const shallowCopyArray = (i, array) => {
+    // return a copy of the array without given element at index 'i'
+    return [...array.slice(0, i), ...array.slice(i + 1)]
+  }
+
   const runAlgorithm = async () => {
     (antsList).forEach((ant, index, array) => {
       // const shallowCopy = shallowCopyArray(index, antsList)
@@ -89,11 +89,13 @@ const Main = (props) => {
       closure((likelihood) => {
         ant.likelihood = likelihood
         ant.loading = false
-        const arr = [ant, ...shallowCopyArray(index, antsList)].sort((a, b) => (b.likelihood || 0.0) - (a.likelihood || 0.0))
+        const arr = [ant, ...shallowCopyArray(index, antsList)].sort((a, b) => {
+          return (b.likelihood || 0.0) - (a.likelihood || 0.0)
+        })
 
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setAntsList(arr)
-        if(index === array.length - 1) setLoading(false)
+        if (index === array.length - 1) setLoading(false)
       })
     })
   }

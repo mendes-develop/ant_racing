@@ -47,20 +47,15 @@ const Label = styled.Text`
   text-align: center;
   color: gray;
 `
-export default function LoginPage() {
+export default function LoginPage({navigation}) {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [usernameError, setUsernameError] = useState({ error: false, message: "" })
     const [passwordError, setPasswordError] = useState({ error: false, message: "" })
     const passwordInput = useRef(null)
-    const navigation = useNavigation()
+    // const navigation = useNavigation()
 
-    React.useEffect(async () => {
-        const user = await _retrieveUser()
-        if (user) {
-            navigation.push("Main")
-        }
-    }, [])
+
 
     const onPress = () => {
         // check length username and password
@@ -70,11 +65,10 @@ export default function LoginPage() {
         } else if (password.length < 6) {
             setPasswordError({ error: true, message: "password too short" })
         } else {
-            // navigate
             setUsernameError({ error: false, message: "" })
             setPasswordError({ error: false, message: "" })
             _storeUser(username)
-            navigation.push("Main")
+            navigation.navigate("Main", {username : username})
         }
     }
 
