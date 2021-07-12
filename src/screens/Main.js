@@ -10,6 +10,7 @@ import { fetchAnts } from '../services/api'
 import { AntsTable, Marquee, Overlay } from '../components'
 import styled from "styled-components/native"
 
+// [TODO] import components from an external folder
 const Label = styled.Text`
   font-size: 16px;
   text-align: center;
@@ -41,7 +42,7 @@ const Main = () => {
     // response will either have data or errors
     const response = await fetchAnts()
     if (response.data) {
-      const antsArray = response.data.ants.map((ant, index) => {
+      const antsArray = response.data.ants.map((ant, i) => {
         ant.likelihood = null;
         ant.loading = false
         return ant
@@ -63,11 +64,16 @@ const Main = () => {
     }
   }, [])
 
+  function shallowCopyArray(index, array) {
+    // return a copy of the array without given element at index 'i'
+    return [...array.slice(0, index), ...array.slice(index + 1)]
+  }
+  
   const onPress = () => {
-    // trigger algorithm function for each of the ants 
-    // setloading(true)
-    // [TODO] perform constant time operations if array.length increases exponentially
+    // Because its a limited data using O(n*log(n))
+    // Use a hash map intead or memoization pattern
     (ants).forEach((ant, index) => {
+      setLoading(true);
       // slice the state and create a new Array
       ant.loading = true
       const shallowCopy = shallowCopyArray(index, ants)
@@ -80,7 +86,7 @@ const Main = () => {
         ant.likelihood = value
 
         // Array.sort
-        const sortedArray = [...shallowCopy, ant].sort((a, b) => (b.likelihood || 0) - (a.likelihood || 0))
+        const sortedArray = [ant, ...shallowCopy,].sort((a, b) => (b.likelihood || 0) - (a.likelihood || 0))
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setAnts(sortedArray)
         if (index === ants.length - 1) setLoading(false)
@@ -96,7 +102,7 @@ const Main = () => {
         {username && <Label>Welcome back, {username}</Label>}
         {error ? <Text>Error</Text> : (
           <View>
-            <Button onPress={() => { setLoading(true); onPress(); }}>
+            <Button onPress={() => {  onPress(); }}>
               <ButtonText>Calculate Odds</ButtonText>
             </Button>
             <AntsTable data={ants} />

@@ -21,7 +21,9 @@ const LandStack = createStackNavigator();
 const MainStack = createStackNavigator();
 const RootStack = createStackNavigator();
 
+// enum
 const Routes = { Login: "Login", Main: "Main" }
+
 function LandStackScreen() {
     return (
         <LandStack.Navigator>
@@ -55,6 +57,7 @@ function MainStackScreen() {
 }
 
 const App = () => {
+    // [TODO] Pattern to land the inital route name?
     return (
         <NavigationContainer>
             <RootStack.Navigator initialRouteName={Routes.Login}>
