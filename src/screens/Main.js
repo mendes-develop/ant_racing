@@ -10,6 +10,7 @@ import { fetchAnts } from '../services/api'
 import { AntsTable, Marquee, Overlay } from '../components'
 import styled from "styled-components/native"
 
+// [TODO] import components from an external folder
 const Label = styled.Text`
   font-size: 16px;
   text-align: center;
@@ -62,9 +63,15 @@ const Main = () => {
       UIManager.setLayoutAnimationEnabledExperimental(true);
     }
   }, [])
-  
 
+  function shallowCopyArray(index, array) {
+    // return a copy of the array without given element at index 'i'
+    return [...array.slice(0, index), ...array.slice(index + 1)]
+  }
+  
   const onPress = () => {
+    // Because its a limited data using O(n*log(n))
+    // Use a hash map intead or memoization pattern
     (ants).forEach((ant, index) => {
       setLoading(true);
       // slice the state and create a new Array
