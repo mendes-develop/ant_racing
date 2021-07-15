@@ -55,7 +55,7 @@ const Main = () => {
   }, [])
 
   useEffect(async () => {
-    // Find a way to not repeate this getter
+    // Pass username through route as props
     const user = await _retrieveUser()
     if (user) setUsername(user)
 
@@ -64,34 +64,45 @@ const Main = () => {
     }
   }, [])
 
+  // return a copy of the array without given element at index 'i'
   function shallowCopyArray(index, array) {
-    // return a copy of the array without given element at index 'i'
     return [...array.slice(0, index), ...array.slice(index + 1)]
   }
-  
-  const onPress = () => {
-    // Because its a limited data using O(n*log(n))
-    // Use a hash map intead or memoization pattern
-    (ants).forEach((ant, index) => {
-      setLoading(true);
-      // slice the state and create a new Array
-      ant.loading = true
-      const shallowCopy = shallowCopyArray(index, ants)
-      setAnts([...shallowCopy, ant])
 
-      const callback = generateAntWinLikelihoodCalculator()
+  // slice the state and create a new Array
+  function sortAnts(index, ant){
+    const shallowCopy = shallowCopyArray(index, ants)
+    const sortedArray = [ant, ...shallowCopy,].sort((a, b) => (b.likelihood || 0) - (a.likelihood || 0))
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+
+    setAnts(sortedArray)
+  }
+
+  // Because its a limited data using O(n*log(n))
+  // Use a hash map intead or memoization pattern
+  const onPress = () => {
+    const loadingAnts = ants.map(ant => {
+      ant.loading = true;
+      return ant
+    })
+
+    setAnts(loadingAnts)
+    setLoading(true);
+
+    (loadingAnts).forEach((ant, index) => {
+      const callback = generateAntWinLikelihoodCalculator() 
       callback(function (value) {
         // update ant likelihood and ant loading state
         ant.loading = false
         ant.likelihood = value
 
-        // Array.sort
-        const sortedArray = [ant, ...shallowCopy,].sort((a, b) => (b.likelihood || 0) - (a.likelihood || 0))
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        setAnts(sortedArray)
-        if (index === ants.length - 1) setLoading(false)
+        sortAnts(index, ant)
+
+        if (index === ants.length - 1) { setLoading(false) }
       })
+
     })
+
   }
 
   return (
@@ -102,7 +113,7 @@ const Main = () => {
         {username && <Label>Welcome back, {username}</Label>}
         {error ? <Text>Error</Text> : (
           <View>
-            <Button onPress={() => {  onPress(); }}>
+            <Button onPress={() => { onPress(); }}>
               <ButtonText>Calculate Odds</ButtonText>
             </Button>
             <AntsTable data={ants} />

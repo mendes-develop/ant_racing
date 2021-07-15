@@ -35,8 +35,6 @@ const Value = styled.Text`
   font-weight: 700;
 `
 
-
-
 const AntSection = ({ item }) => {
 
     const likelihoodpercentage = (function () {
