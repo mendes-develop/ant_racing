@@ -39,6 +39,10 @@ const Main = () => {
 
   useEffect(async () => {
     setLoading(true)
+    // Pass username through route as props
+    const user = await _retrieveUser()
+    if (user) setUsername(user)
+
     // response will either have data or errors
     const response = await fetchAnts()
     if (response.data) {
@@ -51,35 +55,14 @@ const Main = () => {
     } else if (response.errors) {
       setError(true)
     }
-    setLoading(false)
-  }, [])
-
-  useEffect(async () => {
-    // Pass username through route as props
-    const user = await _retrieveUser()
-    if (user) setUsername(user)
-
+    
     if (Platform.OS === 'android') {
       UIManager.setLayoutAnimationEnabledExperimental(true);
     }
+
+    setLoading(false)
   }, [])
 
-  // return a copy of the array without given element at index 'i'
-  function shallowCopyArray(index, array) {
-    return [...array.slice(0, index), ...array.slice(index + 1)]
-  }
-
-  // slice the state and create a new Array
-  function sortAnts(index, ant){
-    const shallowCopy = shallowCopyArray(index, ants)
-    const sortedArray = [ant, ...shallowCopy,].sort((a, b) => (b.likelihood || 0) - (a.likelihood || 0))
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-
-    setAnts(sortedArray)
-  }
-
-  // Because its a limited data using O(n*log(n))
-  // Use a hash map intead or memoization pattern
   const onPress = () => {
     const loadingAnts = ants.map(ant => {
       ant.loading = true;
@@ -89,20 +72,25 @@ const Main = () => {
     setAnts(loadingAnts)
     setLoading(true);
 
-    (loadingAnts).forEach((ant, index) => {
-      const callback = generateAntWinLikelihoodCalculator() 
-      callback(function (value) {
-        // update ant likelihood and ant loading state
-        ant.loading = false
-        ant.likelihood = value
-
-        sortAnts(index, ant)
-
-        if (index === ants.length - 1) { setLoading(false) }
+    const arr = (loadingAnts).map((ant, index) => {
+      return new Promise((resolve, reject) => {
+        const closure = generateAntWinLikelihoodCalculator()
+        closure(function (value) {
+          ant.loading = false
+          ant.likelihood = value
+          resolve(ant)
+        })
       })
-
     })
+    Promise.all(arr).then(sortAnts);
+  }
 
+  // Sorts resolved array of ants and resets loading
+  function sortAnts(ants) {
+    const sortedAnts = ants.sort((a, b) => (b.likelihood || 0) - (a.likelihood || 0))
+    LayoutAnimation.configureNext(LayoutAnimation.create(1000, 'linear', 'opacity'));
+    setAnts(sortedAnts)
+    setLoading(false);
   }
 
   return (

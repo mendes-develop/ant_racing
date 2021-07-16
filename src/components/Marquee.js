@@ -5,9 +5,6 @@ import { Dimensions, Animated, Easing } from 'react-native';
 const width = Dimensions.get('window').width
 export default class Marquee extends React.Component {
     animatedValues = []
-    animatedValue;
-    animatedValue2;
-    animatedValue3;
 
     constructor(props) {
         super(props)
